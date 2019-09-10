@@ -13,11 +13,11 @@ Můžeme použít Vítkův GCP účet a projekt hackaton2019-forehand.
 * Python
 * Případně i Java (záleží na finálním řešení, např. CloudFunctions v javě nelze).
 
-### Organizace
+## Repository
+GitHub - [Heckathon-gol](https://github.com/plavemar/Heckathon-gol.git)
+
+## Organizace
 1. 15:45 - zabereme zasedačku v 0. patře
 2. Po zahájení hackatonu v červené brainstorming a společné doladoladění návrhu
 3. Vytvoření dvojic pro párové programování / DevOpsování
 4. Hackování
-
-### Repository
-GitHub - [Heckathon-gol](https://github.com/plavemar/Heckathon-gol.git)
