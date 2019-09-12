@@ -14,7 +14,6 @@ import eu.profinit.hackaton2019.CSOBforehand.gol.Request;
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +37,20 @@ public class MessagingService implements CommandLineRunner {
     private final GolService golService;
 
     public void sendFirstGeneration() throws IOException, ExecutionException, InterruptedException {
-        publishCreate(boardService.calculateNeighbours(initService.generateFirstGen()));
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen());
+        visualize(nextGeneration);
+        publishCreate(nextGeneration);
     }
 
-    public void publishCreate(List<List<Cell>> generation) throws IOException, ExecutionException, InterruptedException {
+    public void sendNextGeneration(List<String> jsonGeneration) throws IOException, ExecutionException, InterruptedException {
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(toObjectGeneration(jsonGeneration));
+        visualize(nextGeneration);
+        publishCreate(nextGeneration);
+    }
+
+    private void publishCreate(List<List<Cell>> generation) throws IOException, ExecutionException, InterruptedException {
+        TimeUnit.SECONDS.sleep(1);
+
         ProjectTopicName topicName = ProjectTopicName.of("hackaton2019-forehand", "CREATE");
         Publisher publisher = null;
         List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
@@ -49,7 +58,7 @@ public class MessagingService implements CommandLineRunner {
         try {
             publisher = Publisher.newBuilder(topicName).build();
 
-            for (String jsonedCell : jsonifyGeneration(generation)) {
+            for (String jsonedCell : toJsonGeneration(generation)) {
                 ByteString data = ByteString.copyFromUtf8(jsonedCell);
                 PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
 
@@ -70,7 +79,7 @@ public class MessagingService implements CommandLineRunner {
         }
     }
 
-    private List<String> jsonifyGeneration(List<List<Cell>> generation) {
+    private List<String> toJsonGeneration(List<List<Cell>> generation) {
         return generation.stream()
                          .flatMap(List::stream)
                          .map(cell -> {
@@ -84,6 +93,29 @@ public class MessagingService implements CommandLineRunner {
                          .collect(Collectors.toList());
     }
 
+    private List<List<Cell>> toObjectGeneration(List<String> generation) {
+        List<List<Cell>> result = new ArrayList<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            result.add(new ArrayList<>());
+        }
+
+        List<Cell> cells = generation.stream().map(cell -> {
+            try {
+                return objectMapper.readValue(cell, Cell.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).collect(Collectors.toList());
+
+        for (Cell cell : cells) {
+            result.get(cell.getPosition().getY())
+                  .add(cell.getPosition().getX(), cell);
+        }
+
+        return result;
+    }
+
     private void visualize(List<List<Cell>> cells) {
         Request request = new Request();
         ReqState reqState = new ReqState();
@@ -92,8 +124,8 @@ public class MessagingService implements CommandLineRunner {
         List<List<Boolean>> states = cells
                 .stream()
                 .map(l -> l.stream()
-                        .map(c -> c.getState() == 1 ? true : false)
-                        .collect(Collectors.toList()))
+                           .map(c -> c.getState() == 1 ? true : false)
+                           .collect(Collectors.toList()))
                 .collect(Collectors.toList());
         reqState.setValues(states);
         golService.send(request);
