@@ -21,14 +21,14 @@ public class CollectService {
 
     public void receiveFromCollect(MessagingService messagingService) {
         ProjectSubscriptionName subscriptionName =
-                ProjectSubscriptionName.of("hackaton2019-forehand", "CREATE_SUB");
+                ProjectSubscriptionName.of("hackaton2019-forehand", "COLLECT_SUB");
 
         MessageReceiver receiver =
                 new MessageReceiver() {
                     @Override
-                    public void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
+                    public synchronized void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
                         // handle incoming message, then ack/nack the received message
-                        System.out.println("Data received: " + message.getData().toStringUtf8());
+                        System.out.println("Data received: " + message.getData().toStringUtf8() + " count: " + data.size());
                         data.add(message.getData().toStringUtf8());
                         consumer.ack();
 
@@ -36,6 +36,7 @@ public class CollectService {
                             System.out.println("Received 100th message");
                             try {
                                 messagingService.sendNextGeneration(data);
+                                data.clear();
                             } catch (IOException | ExecutionException | InterruptedException e) {
                                 e.printStackTrace();
                             }
