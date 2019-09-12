@@ -21,20 +21,59 @@ public class InitService implements CommandLineRunner {
     private final MessagingService messagingService;
     private final CollectService collectService;
 
-    public List<List<Cell>> generateFirstGen(InitBoard initBoard) {
+    static {
+        Map<Integer, String> stableMap = new HashMap<>();
+        stableMap.put(0, "110011000");
+        stableMap.put(1, "110100100");
+        stableMap.put(2, "000011000");
+        stableMap.put(3, "011000000");
+        stableMap.put(4, "100101100");
+        stableMap.put(5, "010101010");
+        stableMap.put(6, "001010100");
+        stableMap.put(7, "000101000");
+        stableMap.put(8, "000010000");
+
+        Map<Integer, String> oscilators1 = new HashMap<>();
+        stableMap.put(0, "0000000000000000000000");
+        stableMap.put(1, "0000001110000000000000");
+        stableMap.put(2, "0111011100000000000000");
+        stableMap.put(3, "0000000000000000000000");
+        stableMap.put(4, "1100000000000000111000");
+        stableMap.put(5, "1100000000000000101000");
+        stableMap.put(6, "0011000000000000111000");
+        stableMap.put(7, "0011000000000000111000");
+        stableMap.put(8, "0000000000000000111000");
+        stableMap.put(9, "0000000000000000111000");
+        stableMap.put(10, "0000000000000000101000");
+        stableMap.put(11, "0000000000000000111000");
+        stableMap.put(12, "0000000000000000000000");
+        stableMap.put(13, "0000000000000000000000");
+        stableMap.put(14, "0000000000000000000000");
+        stableMap.put(15, "0000000000000000000000");
+
+        Map<Integer, String> oscilators2 = new HashMap<>();
+        stableMap.put(8, "000000000000000000000000000000");
+
+        Map<Integer, String> spaceships1 = new HashMap<>();
+        stableMap.put(8, "000000000000000000000000000000");
+
+        Map<Integer, String> spaceships2 = new HashMap<>();
+        stableMap.put(8, "000000000000000000000000000000");
+    }
+
+    public List<List<Cell>> generateFirstGen(InitBoard initBoard, Integer randomSize) {
         int generation = 0;
         Map<Integer, String> initMap = new HashMap<>();
 
-        initMap.put(0, "1000000000");
-        initMap.put(1, "0100000000");
-        initMap.put(2, "0010000000");
-        initMap.put(3, "0001000100");
-        initMap.put(4, "0000101000");
-        initMap.put(5, "0000010000");
-        initMap.put(6, "0000000100");
-        initMap.put(7, "1110000000");
-        initMap.put(8, "0000110000");
-        initMap.put(9, "0001110000");
+        initMap.put(0, "110011000");
+        initMap.put(0, "110100100");
+        initMap.put(0, "000011000");
+        initMap.put(0, "011000000");
+        initMap.put(0, "100101100");
+        initMap.put(0, "010101010");
+        initMap.put(0, "001010100");
+        initMap.put(0, "000101000");
+        initMap.put(0, "000010000");
 
         return initMap.entrySet().stream()
                       .map(entry -> toCellRow(entry.getValue(), entry.getKey(), generation))
