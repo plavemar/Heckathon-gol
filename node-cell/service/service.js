@@ -1,8 +1,14 @@
 const collect = require('./pubsub');
 
-const getNeighbourCount = (neighbours) => {
+const getNeighbourCount = (neighbors) => {
     let count = 0;
-    neighbours.map((cell) => {
+
+    console.log(neighbors);
+    
+    if(!neighbors) {
+        return 10;
+    }
+    neighbors.map((cell) => {
         count += cell;
     })
     console.log("Neighbour count: ", count);
@@ -15,7 +21,9 @@ exports.resolve = function resolve(request) {
         position: request.position,
     };
 
-    const neighbourCount = getNeighbourCount(request.neighbours);
+    console.log(request.neighbors);
+    
+    const neighbourCount = getNeighbourCount(request.neighbors);
     let status;
     if(request.state === 1) {
         // Cell is alive, rule No. 1 - 3
