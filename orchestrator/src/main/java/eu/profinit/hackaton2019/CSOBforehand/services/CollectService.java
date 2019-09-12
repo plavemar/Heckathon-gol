@@ -31,7 +31,7 @@ public class CollectService {
                         consumer.ack();
 
                         if (data.size() == InitService.BOARD_SIZE*InitService.BOARD_SIZE) {
-                            System.out.println("Received 100th message");
+                            System.out.println("Received " + InitService.BOARD_SIZE*InitService.BOARD_SIZE + "th message");
                             try {
                                 messagingService.sendNextGeneration(data);
                                 data.clear();
