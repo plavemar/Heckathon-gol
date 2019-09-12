@@ -29,7 +29,7 @@ import static eu.profinit.hackaton2019.CSOBforehand.services.InitService.BOARD_S
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MessagingService implements CommandLineRunner {
+public class MessagingService  {
 
     private final InitService initService;
     private final BoardService boardService;
@@ -37,15 +37,19 @@ public class MessagingService implements CommandLineRunner {
     private final GolService golService;
 
     public void sendFirstGeneration() throws IOException, ExecutionException, InterruptedException {
+        System.out.println("FIRST");
+        golService.clearHistory();
         List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen());
         visualize(nextGeneration);
         publishCreate(nextGeneration);
     }
 
     public void sendNextGeneration(List<String> jsonGeneration) throws IOException, ExecutionException, InterruptedException {
+        System.out.println("NEXT");
         List<List<Cell>> nextGeneration = boardService.calculateNeighbours(toObjectGeneration(jsonGeneration));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
+        System.out.println("MOVE");
     }
 
     private void publishCreate(List<List<Cell>> generation) throws IOException, ExecutionException, InterruptedException {
@@ -96,7 +100,7 @@ public class MessagingService implements CommandLineRunner {
     private List<List<Cell>> toObjectGeneration(List<String> generation) {
         List<List<Cell>> result = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
-            result.add(new ArrayList<>());
+            result.add(new ArrayList<>(BOARD_SIZE));
         }
 
         List<Cell> cells = generation.stream().map(cell -> {
@@ -129,10 +133,5 @@ public class MessagingService implements CommandLineRunner {
                 .collect(Collectors.toList());
         reqState.setValues(states);
         golService.send(request);
-    }
-
-    @Override
-    public void run(final String... args) throws Exception {
-        sendFirstGeneration();
     }
 }

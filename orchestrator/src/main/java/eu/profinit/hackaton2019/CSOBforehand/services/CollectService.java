@@ -15,14 +15,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class CollectService implements CommandLineRunner {
-
-    @Autowired
-    private MessagingService service;
+public class CollectService {
 
     private List<String> data = Lists.newArrayList();
 
-    private void receiveFromCollect() {
+    public void receiveFromCollect(MessagingService messagingService) {
         ProjectSubscriptionName subscriptionName =
                 ProjectSubscriptionName.of("hackaton2019-forehand", "CREATE_SUB");
 
@@ -38,7 +35,7 @@ public class CollectService implements CommandLineRunner {
                         if (data.size() == 100) {
                             System.out.println("Received 100th message");
                             try {
-                                service.sendNextGeneration(data);
+                                messagingService.sendNextGeneration(data);
                             } catch (IOException | ExecutionException | InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -59,8 +56,4 @@ public class CollectService implements CommandLineRunner {
         }
     }
 
-    @Override
-    public void run(final String... args) throws Exception {
-        receiveFromCollect();
-    }
 }
