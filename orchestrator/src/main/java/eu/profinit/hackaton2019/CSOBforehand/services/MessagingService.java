@@ -38,13 +38,13 @@ public class MessagingService {
 
     private static final long COLLECT_TIMEOUT = 2;
 
-    private final InitService initService;
     private final BoardService boardService;
     private final ObjectMapper objectMapper;
     private final GolService golService;
 
-    public void sendFirstGeneration(CollectService collectService) throws IOException, ExecutionException, InterruptedException {
-        clearAll(collectService);
+    public void sendFirstGeneration(CollectService collectService, InitService initService) throws IOException, ExecutionException, InterruptedException {
+        clearAll();
+        collectService.data.clear();
         TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
 
         golService.clearHistory();
@@ -145,10 +145,9 @@ public class MessagingService {
         golService.send(request);
     }
 
-    private void clearAll(CollectService collectService) {
+    private void clearAll() {
         clear("CREATE_SUB");
         clear("COLLECT_SUB");
-        collectService.data.clear();
     }
 
     private void clear(String topic) {
