@@ -22,7 +22,7 @@ public class ApiController {
 
     @GetMapping
     @SneakyThrows
-    public String get(@RequestParam("board") String board) {
+    public String get(@RequestParam(name = "board", defaultValue = "RANDOM") String board) {
         messagingService.sendFirstGeneration(collectService, initService, InitBoard.valueOf(board));
 
         return "index";
