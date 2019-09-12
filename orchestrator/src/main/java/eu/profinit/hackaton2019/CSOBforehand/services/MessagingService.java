@@ -8,6 +8,7 @@ import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
+import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -31,18 +32,10 @@ public class MessagingService implements CommandLineRunner {
     private ObjectMapper objectMapper;
 
     public void sendFirstGeneration() throws IOException, ExecutionException, InterruptedException {
-        List<String> firstGen = boardService.calculateNeighbours(initService.generateFirstGen()).stream()
-                                            .flatMap(List::stream)
-                                            .map(cell -> {
-                                                try {
-                                                    return objectMapper.writeValueAsString(cell);
-                                                } catch (JsonProcessingException e) {
-                                                    e.printStackTrace();
-                                                    return null;
-                                                }
-                                            })
-                                            .collect(Collectors.toList());
+        publishCreate(boardService.calculateNeighbours(initService.generateFirstGen()));
+    }
 
+    public void publishCreate(List<List<Cell>> generation) throws IOException, ExecutionException, InterruptedException {
         ProjectTopicName topicName = ProjectTopicName.of("hackaton2019-forehand", "CREATE");
         Publisher publisher = null;
         List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
@@ -50,7 +43,7 @@ public class MessagingService implements CommandLineRunner {
         try {
             publisher = Publisher.newBuilder(topicName).build();
 
-            for (String jsonedCell : firstGen) {
+            for (String jsonedCell : jsonifyGeneration(generation)) {
                 ByteString data = ByteString.copyFromUtf8(jsonedCell);
                 PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
 
@@ -69,6 +62,20 @@ public class MessagingService implements CommandLineRunner {
                 publisher.awaitTermination(1, TimeUnit.MINUTES);
             }
         }
+    }
+
+    private List<String> jsonifyGeneration(List<List<Cell>> generation) {
+        return generation.stream()
+                         .flatMap(List::stream)
+                         .map(cell -> {
+                             try {
+                                 return objectMapper.writeValueAsString(cell);
+                             } catch (JsonProcessingException e) {
+                                 e.printStackTrace();
+                                 return null;
+                             }
+                         })
+                         .collect(Collectors.toList());
     }
 
     @Override
