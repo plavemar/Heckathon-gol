@@ -8,9 +8,12 @@ import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
+import eu.profinit.hackaton2019.CSOBforehand.gol.GolService;
 import eu.profinit.hackaton2019.CSOBforehand.gol.ReqState;
 import eu.profinit.hackaton2019.CSOBforehand.gol.Request;
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -24,16 +27,15 @@ import java.util.stream.Collectors;
 
 import static eu.profinit.hackaton2019.CSOBforehand.services.InitService.BOARD_SIZE;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class MessagingService implements CommandLineRunner {
-    @Autowired
-    private InitService initService;
 
-    @Autowired
-    private BoardService boardService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final InitService initService;
+    private final BoardService boardService;
+    private final ObjectMapper objectMapper;
+    private final GolService golService;
 
     public void sendFirstGeneration() throws IOException, ExecutionException, InterruptedException {
         publishCreate(boardService.calculateNeighbours(initService.generateFirstGen()));
@@ -94,6 +96,7 @@ public class MessagingService implements CommandLineRunner {
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
         reqState.setValues(states);
+        golService.send(request);
     }
 
     @Override
