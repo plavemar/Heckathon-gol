@@ -119,7 +119,7 @@ public class MessagingService {
             }
         }).collect(Collectors.toList());
 
-        Cell[][] cellArray = new Cell[10][10];
+        Cell[][] cellArray = new Cell[BOARD_SIZE][BOARD_SIZE];
 
         cells.forEach(cell -> {
             cellArray[cell.getPosition().getX()][cell.getPosition().getY()] = cell;
