@@ -43,13 +43,17 @@ public class MessagingService {
     private final ObjectMapper objectMapper;
     private final GolService golService;
 
+
     public void sendFirstGeneration(CollectService collectService, InitService initService) throws IOException, ExecutionException, InterruptedException {
+        sendFirstGeneration(collectService, initService, InitBoard.RANDOM);
+    }
+    public void sendFirstGeneration(CollectService collectService, InitService initService, InitBoard initBoard) throws IOException, ExecutionException, InterruptedException {
         clearAll();
         collectService.data.clear();
         TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
 
         golService.clearHistory();
-        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(InitBoard.RANDOM, 5));
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(initBoard, 5));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
     }
