@@ -1,11 +1,13 @@
 package eu.profinit.hackaton2019.CSOBforehand.model;
 
+import java.util.List;
+
 public class Cell {
 
     private int state;
     private int generation;
     private Position position;
-    private int[] neighbors;
+    private List<Integer> neighbors;
 
     public Cell(int state, int generation, Position position) {
         this.state = state;
@@ -13,11 +15,11 @@ public class Cell {
         this.position = position;
     }
 
-    public int[] getNeighbors() {
+    public List<Integer> getNeighbors() {
         return neighbors;
     }
 
-    public void setNeighbors(int[] neighbors) {
+    public void setNeighbors(List<Integer> neighbors) {
         this.neighbors = neighbors;
     }
 
