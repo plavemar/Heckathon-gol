@@ -1,8 +1,9 @@
 package eu.profinit.hackaton2019.CSOBforehand.services;
 
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
+import eu.profinit.hackaton2019.CSOBforehand.model.InitBoard;
 import eu.profinit.hackaton2019.CSOBforehand.model.Position;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,16 +14,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class InitService implements CommandLineRunner {
-    public static final Integer BOARD_SIZE = 10;
+    public static Integer BOARD_SIZE = 10;
 
-    @Autowired
-    private MessagingService messagingService;
+    private final MessagingService messagingService;
+    private final CollectService collectService;
 
-    @Autowired
-    private CollectService collectService;
-
-    public List<List<Cell>> generateFirstGen() {
+    public List<List<Cell>> generateFirstGen(InitBoard initBoard) {
         int generation = 0;
         Map<Integer, String> initMap = new HashMap<>();
 
