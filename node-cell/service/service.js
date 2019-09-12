@@ -9,14 +9,7 @@ const getNeighbourCount = (neighbours) => {
     return count;
 }
 
-exports.pubSubMethod = (pubSubEvent, context) => {
-    const pubSubData = Buffer.from(pubSubEvent.data, 'base64').toString();
-    console.log(`Hello, ${pubSubData}`);
-    response = resolve(pubSubData)
-    console.log(response);
-  };
-
-function resolve(request) {
+exports.resolve = function resolve(request) {
     let response = {
         generation: request.generation + 1,
         position: request.position,

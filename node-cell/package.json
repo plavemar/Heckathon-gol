@@ -23,11 +23,8 @@
   },
   "homepage": "https://github.com/plavemar/Heckathon-gol#readme",
   "dependencies": {
-<<<<<<< HEAD
     "@google-cloud/pubsub": "^0.32.0",
-=======
     "@google-cloud/storage": "^3.2.1",
->>>>>>> 55f78027f71bb9e8eceb27a7d187944b10c96110
     "body-parser": "^1.19.0",
     "express": "^4.17.1"
   }
