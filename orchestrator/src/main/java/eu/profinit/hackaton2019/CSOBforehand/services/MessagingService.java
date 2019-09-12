@@ -48,7 +48,7 @@ public class MessagingService {
         TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
 
         golService.clearHistory();
-        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen());
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(null, null));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
     }
