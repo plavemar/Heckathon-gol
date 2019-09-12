@@ -9,7 +9,7 @@ const getNeighbourCount = (neighbours) => {
 
 exports.resolve = function resolve(request) {
     let response = {
-        generation: request.generation,
+        generation: request.generation + 1,
         position: request.position,
     };
 
