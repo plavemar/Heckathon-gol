@@ -3,33 +3,37 @@ const getNeighbourCount = (neighbours) => {
     neighbours.map((cell) => {
         count += cell;
     })
-
+    console.log("Neighbour count: ", count);
     return count;
 }
 
-function resolve(request) {
+exports.resolve = function resolve(request) {
     let response = {
         generation: request.generation,
         position: request.position,
     };
 
-    const neighbourCount = this.getNeighbourCount
-    if(request.status === 1) {
+    const neighbourCount = getNeighbourCount(request.neighbours);
+    let status;
+    if(request.state === 1) {
         // Cell is alive, rule No. 1 - 3
-        if(neighbourCount === 2 | 3) {
-            response.status = 1;
+        if(neighbourCount === 2 || neighbourCount === 3) {
+            status = 1;
         } else {
-            response.status = 0;
+            status = 0;
         }
-    } else if(request.status === 0) {
+    } else if(request.state === 0) {
         // Cell is dead, rule No. 4
         if(neighbourCount === 3) {
-            response.status = 1;
+            status = 1;
         } else {
-            response.status = 0;
+            status = 0;
         }
     } else {
         // invalid state - not implemented...
     }
-    return response;
+
+    return Object.assign({}, response, {
+        state: status
+    });
 }
