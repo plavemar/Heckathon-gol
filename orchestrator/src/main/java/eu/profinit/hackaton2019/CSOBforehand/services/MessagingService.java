@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -112,12 +113,15 @@ public class MessagingService  {
             }
         }).collect(Collectors.toList());
 
-        for (Cell cell : cells) {
-            result.get(cell.getPosition().getY())
-                  .add(cell.getPosition().getX(), cell);
-        }
+        Cell[][] cellArray = new Cell[10][10];
 
-        return result;
+        cells.forEach(cell -> {
+            cellArray[cell.getPosition().getX()][cell.getPosition().getY()] = cell;
+        });
+
+        return Arrays.stream(cellArray)
+                     .map(Arrays::asList)
+                     .collect(Collectors.toList());
     }
 
     private void visualize(List<List<Cell>> cells) {
