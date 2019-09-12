@@ -31,4 +31,5 @@ function resolve(request) {
     } else {
         // invalid state - not implemented...
     }
+    return response;
 }
