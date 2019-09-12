@@ -1,3 +1,5 @@
+const collect = require('./pubsub');
+
 const getNeighbourCount = (neighbours) => {
     let count = 0;
     neighbours.map((cell) => {
@@ -33,7 +35,9 @@ exports.resolve = function resolve(request) {
         // invalid state - not implemented...
     }
 
-    return Object.assign({}, response, {
+    const message = Object.assign({}, response, {
         state: status
     });
+    
+    collect.collect(JSON.stringify(message));
 }
