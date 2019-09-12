@@ -14,16 +14,16 @@ public class BoardService {
                 List<Integer> neighbours = new ArrayList<>();
                 Cell currentCell = input.get(i).get(j);
 
-                neighbours.add(getCellState(i - 1, j - 1, currentCell));
-                neighbours.add(getCellState(i, j - 1, currentCell));
-                neighbours.add(getCellState(i + 1, j - 1, currentCell));
+                neighbours.add(getCellState(i - 1, j - 1, input));
+                neighbours.add(getCellState(i, j - 1, input));
+                neighbours.add(getCellState(i + 1, j - 1, input));
 
-                neighbours.add(getCellState(i - 1, j, currentCell));
-                neighbours.add(getCellState(i + 1, j, currentCell));
+                neighbours.add(getCellState(i - 1, j, input));
+                neighbours.add(getCellState(i + 1, j, input));
 
-                neighbours.add(getCellState(i - 1, j + 1, currentCell));
-                neighbours.add(getCellState(i, j + 1, currentCell));
-                neighbours.add(getCellState(i + 1, j + 1, currentCell));
+                neighbours.add(getCellState(i - 1, j + 1, input));
+                neighbours.add(getCellState(i, j + 1, input));
+                neighbours.add(getCellState(i + 1, j + 1, input));
 
                 input.get(i).get(j).setNeighbors(neighbours);
             }
@@ -32,11 +32,11 @@ public class BoardService {
         return input;
     }
 
-    private Integer getCellState(int x, int y, Cell cell) {
+    private Integer getCellState(int x, int y, List<List<Cell>> input) {
         if (x < 0 || y < 0 || x >= InitService.BOARD_SIZE || y >= InitService.BOARD_SIZE) {
             return 0;
         }
 
-        return cell.getState();
+        return input.get(x).get(y).getState();
     }
 }
