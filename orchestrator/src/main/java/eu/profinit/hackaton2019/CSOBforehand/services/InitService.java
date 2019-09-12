@@ -92,7 +92,7 @@ public class InitService implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        messagingService.sendFirstGeneration();
+        messagingService.sendFirstGeneration(collectService);
         collectService.receiveFromCollect(messagingService);
     }
 }

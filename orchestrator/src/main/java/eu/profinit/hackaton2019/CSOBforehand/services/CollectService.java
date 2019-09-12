@@ -6,8 +6,6 @@ import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class CollectService {
 
-    private List<String> data = Lists.newArrayList();
+    public List<String> data = Lists.newArrayList();
 
     public void receiveFromCollect(MessagingService messagingService) {
         ProjectSubscriptionName subscriptionName =

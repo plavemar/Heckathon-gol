@@ -4,8 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
+import com.google.cloud.pubsub.v1.AckReplyConsumer;
+import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Publisher;
+import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.protobuf.ByteString;
+import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
 import eu.profinit.hackaton2019.CSOBforehand.gol.GolService;
@@ -14,7 +18,6 @@ import eu.profinit.hackaton2019.CSOBforehand.gol.Request;
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static eu.profinit.hackaton2019.CSOBforehand.services.InitService.BOARD_SIZE;
@@ -30,15 +34,19 @@ import static eu.profinit.hackaton2019.CSOBforehand.services.InitService.BOARD_S
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MessagingService  {
+public class MessagingService {
+
+    private static final long COLLECT_TIMEOUT = 2;
 
     private final InitService initService;
     private final BoardService boardService;
     private final ObjectMapper objectMapper;
     private final GolService golService;
 
-    public void sendFirstGeneration() throws IOException, ExecutionException, InterruptedException {
-        System.out.println("FIRST");
+    public void sendFirstGeneration(CollectService collectService) throws IOException, ExecutionException, InterruptedException {
+        clearAll(collectService);
+        TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
+
         golService.clearHistory();
         List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen());
         visualize(nextGeneration);
@@ -46,11 +54,9 @@ public class MessagingService  {
     }
 
     public void sendNextGeneration(List<String> jsonGeneration) throws IOException, ExecutionException, InterruptedException {
-        System.out.println("NEXT");
         List<List<Cell>> nextGeneration = boardService.calculateNeighbours(toObjectGeneration(jsonGeneration));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
-        System.out.println("MOVE");
     }
 
     private void publishCreate(List<List<Cell>> generation) throws IOException, ExecutionException, InterruptedException {
@@ -86,16 +92,16 @@ public class MessagingService  {
 
     private List<String> toJsonGeneration(List<List<Cell>> generation) {
         return generation.stream()
-                         .flatMap(List::stream)
-                         .map(cell -> {
-                             try {
-                                 return objectMapper.writeValueAsString(cell);
-                             } catch (JsonProcessingException e) {
-                                 e.printStackTrace();
-                                 return null;
-                             }
-                         })
-                         .collect(Collectors.toList());
+                .flatMap(List::stream)
+                .map(cell -> {
+                    try {
+                        return objectMapper.writeValueAsString(cell);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private List<List<Cell>> toObjectGeneration(List<String> generation) {
@@ -120,8 +126,8 @@ public class MessagingService  {
         });
 
         return Arrays.stream(cellArray)
-                     .map(Arrays::asList)
-                     .collect(Collectors.toList());
+                .map(Arrays::asList)
+                .collect(Collectors.toList());
     }
 
     private void visualize(List<List<Cell>> cells) {
@@ -132,10 +138,44 @@ public class MessagingService  {
         List<List<Boolean>> states = cells
                 .stream()
                 .map(l -> l.stream()
-                           .map(c -> c.getState() == 1 ? true : false)
-                           .collect(Collectors.toList()))
+                        .map(c -> c.getState() == 1 ? true : false)
+                        .collect(Collectors.toList()))
                 .collect(Collectors.toList());
         reqState.setValues(states);
         golService.send(request);
+    }
+
+    private void clearAll(CollectService collectService) {
+        clear("CREATE_SUB");
+        clear("COLLECT_SUB");
+        collectService.data.clear();
+    }
+
+    private void clear(String topic) {
+        ProjectSubscriptionName subscriptionName =
+                ProjectSubscriptionName.of("hackaton2019-forehand", topic);
+
+        MessageReceiver receiver =
+                new MessageReceiver() {
+                    @Override
+                    public synchronized void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
+                        System.out.println("Deleting: " + topic);
+                        consumer.ack();
+                    }
+                };
+
+        Subscriber subscriber = null;
+        try {
+            subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
+            subscriber.startAsync().awaitRunning();
+            // Allow the subscriber to run indefinitely unless an unrecoverable error occurs
+            subscriber.awaitRunning(COLLECT_TIMEOUT, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } finally {
+            if (subscriber != null) {
+                subscriber.stopAsync();
+            }
+        }
     }
 }
