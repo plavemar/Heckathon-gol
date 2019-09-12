@@ -83,6 +83,8 @@ public class MessagingService {
                 messageIdFutures.add(messageIdFuture);
             }
         } finally {
+            ApiFutures.allAsList(messageIdFutures).get();
+
             if (publisher != null) {
                 publisher.shutdown();
                 publisher.awaitTermination(1, TimeUnit.MINUTES);
