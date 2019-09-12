@@ -8,6 +8,8 @@ import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
+import eu.profinit.hackaton2019.CSOBforehand.gol.ReqState;
+import eu.profinit.hackaton2019.CSOBforehand.gol.Request;
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static eu.profinit.hackaton2019.CSOBforehand.services.InitService.BOARD_SIZE;
 
 @Service
 public class MessagingService implements CommandLineRunner {
@@ -76,6 +80,20 @@ public class MessagingService implements CommandLineRunner {
                              }
                          })
                          .collect(Collectors.toList());
+    }
+
+    private void visualize(List<List<Cell>> cells) {
+        Request request = new Request();
+        ReqState reqState = new ReqState();
+        request.setState(reqState);
+        reqState.setItemsCount(BOARD_SIZE);
+        List<List<Boolean>> states = cells
+                .stream()
+                .map(l -> l.stream()
+                        .map(c -> c.getState() == 1 ? true : false)
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+        reqState.setValues(states);
     }
 
     @Override
