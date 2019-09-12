@@ -18,16 +18,16 @@ public class InitService {
         int generation = 0;
         Map<Integer, String> initMap = new HashMap<>();
 
-        initMap.put(0, "0000000000");
-        initMap.put(1, "0000000000");
-        initMap.put(2, "0000000000");
-        initMap.put(3, "0000000000");
-        initMap.put(4, "0000000000");
-        initMap.put(5, "0000000000");
-        initMap.put(6, "0000000000");
-        initMap.put(7, "0000000000");
-        initMap.put(8, "0000000000");
-        initMap.put(9, "0000000000");
+        initMap.put(0, "1000000000");
+        initMap.put(1, "0100000000");
+        initMap.put(2, "0010000000");
+        initMap.put(3, "0001000100");
+        initMap.put(4, "0000101000");
+        initMap.put(5, "0000010000");
+        initMap.put(6, "0000000100");
+        initMap.put(7, "1110000000");
+        initMap.put(8, "0000110000");
+        initMap.put(9, "0001110000");
 
         return initMap.entrySet().stream()
                       .map(entry -> toCellRow(entry.getValue(), entry.getKey(), generation))
