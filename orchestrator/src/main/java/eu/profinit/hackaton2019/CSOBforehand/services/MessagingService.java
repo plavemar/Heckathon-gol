@@ -16,6 +16,7 @@ import eu.profinit.hackaton2019.CSOBforehand.gol.GolService;
 import eu.profinit.hackaton2019.CSOBforehand.gol.ReqState;
 import eu.profinit.hackaton2019.CSOBforehand.gol.Request;
 import eu.profinit.hackaton2019.CSOBforehand.model.Cell;
+import eu.profinit.hackaton2019.CSOBforehand.model.InitBoard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class MessagingService {
         TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
 
         golService.clearHistory();
-        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(null, null));
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(InitBoard.RANDOM, 5));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
     }

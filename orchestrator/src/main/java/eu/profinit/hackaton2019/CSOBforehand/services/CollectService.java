@@ -30,7 +30,7 @@ public class CollectService {
                         data.add(message.getData().toStringUtf8());
                         consumer.ack();
 
-                        if (data.size() == 100) {
+                        if (data.size() == InitService.BOARD_SIZE*InitService.BOARD_SIZE) {
                             System.out.println("Received 100th message");
                             try {
                                 messagingService.sendNextGeneration(data);
