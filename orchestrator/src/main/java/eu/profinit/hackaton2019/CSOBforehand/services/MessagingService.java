@@ -53,7 +53,7 @@ public class MessagingService {
         TimeUnit.SECONDS.sleep(COLLECT_TIMEOUT);
 
         golService.clearHistory();
-        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(initBoard, 5));
+        List<List<Cell>> nextGeneration = boardService.calculateNeighbours(initService.generateFirstGen(initBoard, 3));
         visualize(nextGeneration);
         publishCreate(nextGeneration);
     }
@@ -76,18 +76,13 @@ public class MessagingService {
 
             for (String jsonedCell : toJsonGeneration(generation)) {
                 ByteString data = ByteString.copyFromUtf8(jsonedCell);
+                System.out.println("Data send: " + jsonedCell);
                 PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
 
                 ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
                 messageIdFutures.add(messageIdFuture);
             }
         } finally {
-            List<String> messageIds = ApiFutures.allAsList(messageIdFutures).get();
-
-            for (String messageId : messageIds) {
-                System.out.println("published with message ID: " + messageId);
-            }
-
             if (publisher != null) {
                 publisher.shutdown();
                 publisher.awaitTermination(1, TimeUnit.MINUTES);
