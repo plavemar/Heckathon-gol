@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class InitService implements CommandLineRunner {
-    public List<Cell> generateFirstGen() {
+    public static final Integer BOARD_SIZE = 10;
+
+    public List<List<Cell>> generateFirstGen() {
         int generation = 0;
         Map<Integer, String> initMap = new HashMap<>();
 
@@ -29,10 +31,7 @@ public class InitService implements CommandLineRunner {
         initMap.put(9, "0000000000");
 
         return initMap.entrySet().stream()
-                      .map(entry -> {
-                          return toCellRow(entry.getValue(), entry.getKey(), generation);
-                      })
-                      .flatMap(List::stream)
+                      .map(entry -> toCellRow(entry.getValue(), entry.getKey(), generation))
                       .collect(Collectors.toList());
     }
 
