@@ -2,16 +2,9 @@ const collect = require('./pubsub');
 
 const getNeighbourCount = (neighbors) => {
     let count = 0;
-
-    console.log(neighbors);
-    
-    if(!neighbors) {
-        return 10;
-    }
     neighbors.map((cell) => {
         count += cell;
     })
-    console.log("Neighbour count: ", count);
     return count;
 }
 
@@ -20,8 +13,6 @@ exports.resolve = function resolve(request) {
         generation: request.generation + 1,
         position: request.position,
     };
-
-    console.log(request.neighbors);
     
     const neighbourCount = getNeighbourCount(request.neighbors);
     let status;

@@ -6,5 +6,4 @@ exports.collect = async function (message) {
     const dataBuffer = Buffer.from(message);
 
     const messageId = await pubsub.topic('COLLECT').publish(dataBuffer);
-    console.log("Message pushed with id: ", messageId);
 }
